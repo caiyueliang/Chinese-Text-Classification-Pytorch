@@ -58,7 +58,7 @@ class Model(nn.Module):
         return x
 
     def forward(self, x):
-        out = self.embedding(x[0])
+        out = self.embedding(x[0])          # x是一个tuple, 这边只用了第一个元素，即文本的索引。
         out = out.unsqueeze(1)
         out = torch.cat([self.conv_and_pool(out, conv) for conv in self.convs], 1)
         out = self.dropout(out)

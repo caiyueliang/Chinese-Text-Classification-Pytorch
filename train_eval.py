@@ -43,8 +43,8 @@ def train(config, model, train_iter, dev_iter, test_iter):
         # scheduler.step() # 学习率衰减
         for i, (trains, labels) in enumerate(train_iter):
             print(" =============================== ")
-            print("[train][trains] {}".format(trains))
-            print("[train][labels] {}".format(labels))
+            print("[train][trains] {}; {}".format(trains.size(), trains))
+            print("[train][labels] {}; {}".format(labels.size(), labels))
 
             outputs = model(trains)
             model.zero_grad()

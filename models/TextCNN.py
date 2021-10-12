@@ -58,9 +58,17 @@ class Model(nn.Module):
         return x
 
     def forward(self, x):
-        out = self.embedding(x[0])          # x是一个tuple, 这边只用了第一个元素，即文本的索引。
-        out = out.unsqueeze(1)
+        print(" =============================== ")
+        x, _ = x                            # x是一个tuple, 这边只用了第一个元素，即文本的索引。[batch_size, seq_len] = [128, 32]
+        print("[TextCNN] x[0]: {}".format(x.size()))
+        out = self.embedding(x)
+        print("[TextCNN] after [embedding]: {}".format(out.size()))
+        out = out.unsqueeze(1)              # 多一维: [batch_size, 1, seq_len] = [128, 1, 32]
+        print("[TextCNN] after [unsqueeze]: {}".format(out.size()))
         out = torch.cat([self.conv_and_pool(out, conv) for conv in self.convs], 1)
+        print("[TextCNN] after [conv_and_pool]: {}".format(out.size()))
         out = self.dropout(out)
+        print("[TextCNN] after [dropout]: {}".format(out.size()))
         out = self.fc(out)
+        print("[TextCNN] after [fc]: {}".format(out.size()))
         return out

@@ -51,10 +51,15 @@ class Model(nn.Module):
         self.fc = nn.Linear(config.hidden_size * 2, config.num_classes)
 
     def forward(self, x):
-        x, _ = x
-        out = self.embedding(x)  # [batch_size, seq_len, embeding]=[128, 32, 300]
+        print(" =============================== ")
+        x, _ = x                    # [batch_size, seq_len] = [128, 32]
+        print("[TextCNN] x[0]: {}".format(x.size()))
+        out = self.embedding(x)     # [batch_size, seq_len, embedding] = [128, 32, 300]
+        print("[TextCNN] after [embedding]: {}".format(out.size()))
         out, _ = self.lstm(out)
+        print("[TextCNN] after [lstm]: {}".format(out.size()))
         out = self.fc(out[:, -1, :])  # 句子最后时刻的 hidden state
+        print("[TextCNN] after [fc]: {}".format(out.size()))
         return out
 
     '''变长RNN，效果差不多，甚至还低了点...'''

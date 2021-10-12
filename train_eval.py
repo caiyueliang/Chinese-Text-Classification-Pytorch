@@ -42,10 +42,10 @@ def train(config, model, train_iter, dev_iter, test_iter):
         print('Epoch [{}/{}]'.format(epoch + 1, config.num_epochs))
         # scheduler.step() # 学习率衰减
         for i, (trains, labels) in enumerate(train_iter):
-            print(" =============================== ")
-            for item in trains:
-                print("[train][trains][item] {}; {}".format(item.size(), item))
-            print("[train][labels] {}; {}".format(labels.size(), labels))
+            # print(" =============================== ")
+            # for item in trains:
+            #     print("[train][trains][item] {}; {}".format(item.size(), item))
+            # print("[train][labels] {}; {}".format(labels.size(), labels))
 
             outputs = model(trains)
             model.zero_grad()

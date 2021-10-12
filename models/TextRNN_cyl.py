@@ -60,6 +60,7 @@ class Model(nn.Module):
         # else:
         #     self.embedding = nn.Embedding(config.n_vocab, config.embed, padding_idx=config.n_vocab - 1)
 
+        # **input** of shape `(seq_len, batch, input_size)`: tensor containing the features of the input sequence.
         self.lstm = nn.LSTM(config.embed, config.hidden_size, config.num_layers,
                             bidirectional=True, batch_first=True, dropout=config.dropout)
         self.fc = nn.Linear(config.hidden_size * 2, config.num_classes)

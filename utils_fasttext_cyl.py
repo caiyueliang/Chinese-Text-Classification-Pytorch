@@ -73,17 +73,16 @@ class DatasetIterater(object):
         # indexx = np.argsort(xx)[::-1]
         # datas = np.array(datas)[indexx]
 
-        print("====== ====== ======")
-        x = [_[0] for _ in datas]
-        print(x)
-        x = torch.Tensor([_[0] for _ in datas]).to(self.device)
+        print("====================================")
+        # print([_[0] for _ in datas])
+        # x = torch.Tensor([_[0] for _ in datas]).to(self.device)
+        x = torch.stack([_[0] for _ in datas], dim=0).to(self.device)
         y = torch.Tensor([_[1] for _ in datas]).to(self.device)
         # bigram = torch.LongTensor([_[3] for _ in datas]).to(self.device)
         # trigram = torch.LongTensor([_[4] for _ in datas]).to(self.device)
         #
         # # pad前的长度(超过pad_size的设为pad_size)
         # seq_len = torch.LongTensor([_[2] for _ in datas]).to(self.device)
-        print("====== ====== ======")
         return (x), y
 
     def __next__(self):
@@ -129,8 +128,8 @@ if __name__ == "__main__":
 
     # a = [1, 2, 3]
     # b = [2, 3, 4]
-    a = [[1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3]]
-    b = [[2, 3, 4], [2, 3, 4], [2, 3, 4], [2, 3, 4]]
+    # a = [[1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3]]
+    # b = [[2, 3, 4], [2, 3, 4], [2, 3, 4], [2, 3, 4]]
 
     a = torch.tensor([[0, 1, 3], [0, 1, 3], [0, 1, 3], [3, 4, 5]])
     b = torch.tensor([[0, 2, 4], [0, 2, 4], [0, 2, 4], [1, 4, 8]])

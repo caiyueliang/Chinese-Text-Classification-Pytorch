@@ -7,11 +7,11 @@ from importlib import import_module
 import argparse
 
 parser = argparse.ArgumentParser(description='Chinese Text Classification')
-parser.add_argument('--model', type=str, required=True, default='TextCNN', help='choose a model: TextCNN, TextRNN, FastText, TextRCNN, TextRNN_Att, DPCNN, Transformer')
+parser.add_argument('--model', type=str, default='TextCNN_cyl', help='choose a model: TextCNN, TextRNN, FastText, TextRCNN, TextRNN_Att, DPCNN, Transformer')
 parser.add_argument('--embedding', default='pre_trained', type=str, help='random or pre_trained')
 parser.add_argument('--word', default=False, type=bool, help='True for word, False for char')
 # parser.add_argument('--dataset', default="THUCNews")
-parser.add_argument('--dataset', default="./data_train/v1.0.0/")
+parser.add_argument('--dataset', default="E:\PythonProject\TestDemo\quant\data_train\\v1.0.0\\")
 args = parser.parse_args()
 
 
@@ -51,7 +51,7 @@ if __name__ == '__main__':
     print("Time usage:", time_dif)
 
     # train
-    config.n_vocab = len(vocab)
+    # config.n_vocab = len(vocab)
     model = x.Model(config).to(config.device)
     if model_name != 'Transformer':
         init_network(model)

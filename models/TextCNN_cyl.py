@@ -44,7 +44,7 @@ class Config(object):
 
         # self.embed = self.embedding_pretrained.size(1)\
         #     if self.embedding_pretrained is not None else 300         # 字向量维度
-        self.embed = 30
+        self.embed = 21
 
         self.filter_sizes = (2, 3, 4)                                   # 卷积核尺寸
         self.num_filters = 256                                          # 卷积核数量(channels数)
@@ -74,7 +74,7 @@ class Model(nn.Module):
 
     def forward(self, x):
         print(" =============================== ")
-        x = x[0]                            # x是一个tuple, 这边只用了第一个元素，即文本的索引。[batch_size, seq_len] = [128, 32]
+        # x = x[0]                            # x是一个tuple, 这边只用了第一个元素，即文本的索引。[batch_size, seq_len] = [128, 32]
         print("[TextCNN] x: {}".format(x.size()))
 
         out = x

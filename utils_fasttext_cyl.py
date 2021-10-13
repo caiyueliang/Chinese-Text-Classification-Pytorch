@@ -77,13 +77,16 @@ class DatasetIterater(object):
         # print([_[0] for _ in datas])
         # x = torch.Tensor([_[0] for _ in datas]).to(self.device)
         x = torch.stack([_[0] for _ in datas], dim=0).to(self.device)
-        y = torch.Tensor([_[1] for _ in datas]).to(self.device)
+        x = x.type(torch.LongTensor)
+        # x = torch.DoubleTensor(x).to(self.device)
+        print(x.size())
+        y = torch.LongTensor([_[1] for _ in datas]).to(self.device)
         # bigram = torch.LongTensor([_[3] for _ in datas]).to(self.device)
         # trigram = torch.LongTensor([_[4] for _ in datas]).to(self.device)
         #
         # # pad前的长度(超过pad_size的设为pad_size)
         # seq_len = torch.LongTensor([_[2] for _ in datas]).to(self.device)
-        return (x), y
+        return x, y
 
     def __next__(self):
         if self.residue and self.index == self.n_batches:

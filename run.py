@@ -6,11 +6,13 @@ from train_eval import train, init_network
 from importlib import import_module
 import argparse
 
+# torch.set_default_tensor_type(torch.DoubleTensor)
+
 parser = argparse.ArgumentParser(description='Chinese Text Classification')
-# parser.add_argument('--model', type=str, default='TextCNN_cyl', help='choose a model: TextCNN, TextRNN, FastText, TextRCNN, TextRNN_Att, DPCNN, Transformer')
-# parser.add_argument('--dataset', default="E:\PythonProject\TestDemo\quant\data_train\\v1.0.0\\")
-parser.add_argument('--model', type=str, default='TextCNN', help='choose a model: TextCNN, TextRNN, FastText, TextRCNN, TextRNN_Att, DPCNN, Transformer')
-parser.add_argument('--dataset', default="THUCNews")
+parser.add_argument('--model', type=str, default='TextCNN_cyl', help='choose a model: TextCNN, TextRNN, FastText, TextRCNN, TextRNN_Att, DPCNN, Transformer')
+parser.add_argument('--dataset', default="E:\PythonProject\TestDemo\quant\data_train\\v1.0.0\\")
+# parser.add_argument('--model', type=str, default='TextCNN', help='choose a model: TextCNN, TextRNN, FastText, TextRCNN, TextRNN_Att, DPCNN, Transformer')
+# parser.add_argument('--dataset', default="THUCNews")
 parser.add_argument('--embedding', default='pre_trained', type=str, help='random or pre_trained')
 parser.add_argument('--word', default=False, type=bool, help='True for word, False for char')
 args = parser.parse_args()

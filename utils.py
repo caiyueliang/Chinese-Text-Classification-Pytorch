@@ -81,11 +81,12 @@ class DatasetIterater(object):
 
     def _to_tensor(self, datas):
         print("====== ====== ======")
-        x = [_[0] for _ in datas]
-        print(x)
+        # x = [_[0] for _ in datas]
+        # print(x)
 
         x = torch.LongTensor([_[0] for _ in datas]).to(self.device)
         y = torch.LongTensor([_[1] for _ in datas]).to(self.device)
+        print(x.size())
 
         # pad前的长度(超过pad_size的设为pad_size)
         seq_len = torch.LongTensor([_[2] for _ in datas]).to(self.device)

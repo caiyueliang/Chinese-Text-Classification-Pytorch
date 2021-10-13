@@ -28,6 +28,7 @@ def init_network(model, method='xavier', exclude='embedding', seed=123):
 
 def train(config, model, train_iter, dev_iter, test_iter):
     start_time = time.time()
+    # model.double()
     model.train()
     optimizer = torch.optim.Adam(model.parameters(), lr=config.learning_rate)
 
@@ -49,7 +50,14 @@ def train(config, model, train_iter, dev_iter, test_iter):
 
             outputs = model(trains)
             model.zero_grad()
+            print("[outputs] {} {}".format(outputs.type(), outputs))
+            print("[labels] {} {}".format(labels.type(), labels))
+            # outputs = outputs.type(torch.Tensor)
+            # labels = labels.type(torch.Tensor)
+            # print("[outputs] {}".format(outputs.type()))
+            # print("[labels] {}".format(labels.type()))
             loss = F.cross_entropy(outputs, labels)
+            # loss.double()
             loss.backward()
             optimizer.step()
             if total_batch % 100 == 0:
@@ -58,6 +66,7 @@ def train(config, model, train_iter, dev_iter, test_iter):
                 predic = torch.max(outputs.data, 1)[1].cpu()
                 train_acc = metrics.accuracy_score(true, predic)
                 dev_acc, dev_loss = evaluate(config, model, dev_iter)
+
                 if dev_loss < dev_best_loss:
                     dev_best_loss = dev_loss
                     torch.save(model.state_dict(), config.save_path)

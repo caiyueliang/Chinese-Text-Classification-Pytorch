@@ -55,18 +55,36 @@ class DatasetIterater(object):
         self.index = 0
         self.device = device
 
+    # def _to_tensor(self, datas):
+    #     # xx = [xxx[2] for xxx in datas]
+    #     # indexx = np.argsort(xx)[::-1]
+    #     # datas = np.array(datas)[indexx]
+    #     x = torch.LongTensor([_[0] for _ in datas]).to(self.device)
+    #     y = torch.LongTensor([_[1] for _ in datas]).to(self.device)
+    #     bigram = torch.LongTensor([_[3] for _ in datas]).to(self.device)
+    #     trigram = torch.LongTensor([_[4] for _ in datas]).to(self.device)
+    #
+    #     # pad前的长度(超过pad_size的设为pad_size)
+    #     seq_len = torch.LongTensor([_[2] for _ in datas]).to(self.device)
+    #     return (x, seq_len, bigram, trigram), y
+
     def _to_tensor(self, datas):
         # xx = [xxx[2] for xxx in datas]
         # indexx = np.argsort(xx)[::-1]
         # datas = np.array(datas)[indexx]
-        x = torch.LongTensor([_[0] for _ in datas]).to(self.device)
-        y = torch.LongTensor([_[1] for _ in datas]).to(self.device)
-        bigram = torch.LongTensor([_[3] for _ in datas]).to(self.device)
-        trigram = torch.LongTensor([_[4] for _ in datas]).to(self.device)
 
-        # pad前的长度(超过pad_size的设为pad_size)
-        seq_len = torch.LongTensor([_[2] for _ in datas]).to(self.device)
-        return (x, seq_len, bigram, trigram), y
+        print("====== ====== ======")
+        x = [_[0] for _ in datas]
+        print(x)
+        x = torch.Tensor([_[0] for _ in datas]).to(self.device)
+        y = torch.Tensor([_[1] for _ in datas]).to(self.device)
+        # bigram = torch.LongTensor([_[3] for _ in datas]).to(self.device)
+        # trigram = torch.LongTensor([_[4] for _ in datas]).to(self.device)
+        #
+        # # pad前的长度(超过pad_size的设为pad_size)
+        # seq_len = torch.LongTensor([_[2] for _ in datas]).to(self.device)
+        print("====== ====== ======")
+        return (x), y
 
     def __next__(self):
         if self.residue and self.index == self.n_batches:
@@ -107,21 +125,43 @@ def get_time_dif(start_time):
 
 
 if __name__ == "__main__":
-    '''提取预训练词向量'''
-    vocab_dir = "./THUCNews/data/vocab.pkl"
-    pretrain_dir = "./THUCNews/data/sgns.sogou.char"
-    emb_dim = 300
-    filename_trimmed_dir = "./THUCNews/data/vocab.embedding.sougou"
-    word_to_id = pkl.load(open(vocab_dir, 'rb'))
-    embeddings = np.random.rand(len(word_to_id), emb_dim)
-    f = open(pretrain_dir, "r", encoding='UTF-8')
-    for i, line in enumerate(f.readlines()):
-        # if i == 0:  # 若第一行是标题，则跳过
-        #     continue
-        lin = line.strip().split(" ")
-        if lin[0] in word_to_id:
-            idx = word_to_id[lin[0]]
-            emb = [float(x) for x in lin[1:301]]
-            embeddings[idx] = np.asarray(emb, dtype='float32')
-    f.close()
-    np.savez_compressed(filename_trimmed_dir, embeddings=embeddings)
+    data = list()
+
+    # a = [1, 2, 3]
+    # b = [2, 3, 4]
+    a = [[1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3]]
+    b = [[2, 3, 4], [2, 3, 4], [2, 3, 4], [2, 3, 4]]
+
+    a = torch.tensor([[0, 1, 3], [0, 1, 3], [0, 1, 3], [3, 4, 5]])
+    b = torch.tensor([[0, 2, 4], [0, 2, 4], [0, 2, 4], [1, 4, 8]])
+
+    data.append(a)
+    data.append(b)
+
+    print(data)
+
+    # x = torch.Tensor(data)
+    # x = torch.cat(data, dim=0)
+    x = torch.stack(data, dim=0)
+    print(x)
+    print(x.size())
+
+
+    # '''提取预训练词向量'''
+    # vocab_dir = "./THUCNews/data/vocab.pkl"
+    # pretrain_dir = "./THUCNews/data/sgns.sogou.char"
+    # emb_dim = 300
+    # filename_trimmed_dir = "./THUCNews/data/vocab.embedding.sougou"
+    # word_to_id = pkl.load(open(vocab_dir, 'rb'))
+    # embeddings = np.random.rand(len(word_to_id), emb_dim)
+    # f = open(pretrain_dir, "r", encoding='UTF-8')
+    # for i, line in enumerate(f.readlines()):
+    #     # if i == 0:  # 若第一行是标题，则跳过
+    #     #     continue
+    #     lin = line.strip().split(" ")
+    #     if lin[0] in word_to_id:
+    #         idx = word_to_id[lin[0]]
+    #         emb = [float(x) for x in lin[1:301]]
+    #         embeddings[idx] = np.asarray(emb, dtype='float32')
+    # f.close()
+    # np.savez_compressed(filename_trimmed_dir, embeddings=embeddings)

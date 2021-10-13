@@ -80,6 +80,10 @@ class DatasetIterater(object):
         self.device = device
 
     def _to_tensor(self, datas):
+        print("====== ====== ======")
+        x = [_[0] for _ in datas]
+        print(x)
+
         x = torch.LongTensor([_[0] for _ in datas]).to(self.device)
         y = torch.LongTensor([_[1] for _ in datas]).to(self.device)
 

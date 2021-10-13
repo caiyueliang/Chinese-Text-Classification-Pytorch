@@ -74,7 +74,7 @@ class Model(nn.Module):
 
     def forward(self, x):
         print(" =============================== ")
-        # x, _ = x                          # x是一个tuple, 这边只用了第一个元素，即文本的索引。[batch_size, seq_len] = [128, 32]
+        x = x[0]                            # x是一个tuple, 这边只用了第一个元素，即文本的索引。[batch_size, seq_len] = [128, 32]
         print("[TextCNN] x: {}".format(x.size()))
 
         out = x

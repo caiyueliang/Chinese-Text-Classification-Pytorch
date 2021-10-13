@@ -4,5 +4,6 @@
 .DS_Store
 */._*.sh
 */._*.py
+*/log/
 
 *__pycache__/

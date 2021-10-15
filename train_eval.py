@@ -50,8 +50,8 @@ def train(config, model, train_iter, dev_iter, test_iter):
 
             outputs = model(trains)
             model.zero_grad()
-            print("[outputs] {} {}".format(outputs.type(), outputs))
-            print("[labels] {} {}".format(labels.type(), labels))
+            # print("[outputs] {} {}".format(outputs.type(), outputs))
+            # print("[labels] {} {}".format(labels.type(), labels))
             # outputs = outputs.type(torch.Tensor)
             # labels = labels.type(torch.Tensor)
             # print("[outputs] {}".format(outputs.type()))

@@ -73,13 +73,14 @@ class DatasetIterater(object):
         # indexx = np.argsort(xx)[::-1]
         # datas = np.array(datas)[indexx]
 
-        print("====================================")
+        # print("====================================")
         # print([_[0] for _ in datas])
         # x = torch.Tensor([_[0] for _ in datas]).to(self.device)
         x = torch.stack([_[0] for _ in datas], dim=0).to(self.device)
-        x = x.type(torch.LongTensor)
-        # x = torch.DoubleTensor(x).to(self.device)
-        print(x.size())
+        # print("[_to_tensor] {}".format(x))
+        x = x.to(torch.float32)
+        # print("[_to_tensor] size:{} type:{}".format(x.size(), x.type()))
+        # print("[_to_tensor] {}".format(x))
         y = torch.LongTensor([_[1] for _ in datas]).to(self.device)
         # bigram = torch.LongTensor([_[3] for _ in datas]).to(self.device)
         # trigram = torch.LongTensor([_[4] for _ in datas]).to(self.device)

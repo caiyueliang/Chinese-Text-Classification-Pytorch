@@ -39,7 +39,7 @@ class Config(object):
         # self.n_vocab = 0                                              # 词表大小，在运行时赋值
         self.num_epochs = 20                                            # epoch数
         self.batch_size = 128                                           # mini-batch大小
-        self.pad_size = 32                                            # 每句话处理成的长度(短填长切)
+        self.pad_size = 32                                              # 每句话处理成的长度(短填长切)
         self.learning_rate = 1e-3                                       # 学习率
 
         # self.embed = self.embedding_pretrained.size(1)\
@@ -73,21 +73,22 @@ class Model(nn.Module):
         return x
 
     def forward(self, x):
-        print(" =============================== ")
+        # print(" =============================== ")
         # x = x[0]                            # x是一个tuple, 这边只用了第一个元素，即文本的索引。[batch_size, seq_len] = [128, 32]
-        print("[TextCNN] x: {}".format(x.size()))
+        # print("[TextCNN] x: {} {}".format(x.size(), x.type()))
+        # print("[TextCNN] x: {}".format(x))
 
         out = x
         # out = self.embedding(x)
-        print("[TextCNN] after [embedding]: {}".format(out.size()))
+        # print("[TextCNN] after [embedding]: {}".format(out.size()))
 
         out = out.unsqueeze(1)              # 多一维: [batch_size, 1, seq_len] = [128, 1, 32]
-        print("[TextCNN] after [unsqueeze]: {}".format(out.size()))
+        # print("[TextCNN] after [unsqueeze]: {}".format(out.size()))
         out = torch.cat([self.conv_and_pool(out, conv) for conv in self.convs], 1)
-        print("[TextCNN] after [conv_and_pool]: {}".format(out.size()))
+        # print("[TextCNN] after [conv_and_pool]: {}".format(out.size()))
         out = self.dropout(out)
-        print("[TextCNN] after [dropout]: {}".format(out.size()))
+        # print("[TextCNN] after [dropout]: {}".format(out.size()))
         out = self.fc(out)
-        print("[TextCNN] after [fc]: {}".format(out.size()))
+        # print("[TextCNN] after [fc]: {}".format(out.size()))
 
         return out

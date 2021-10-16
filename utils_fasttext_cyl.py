@@ -38,8 +38,11 @@ def build_dataset(config, ues_word):
         return contents
 
     train = load_dataset(config.train_path, config.pad_size)
+    print("[build_dataset] train len: {}".format(len(train)), flush=True)
     dev = load_dataset(config.dev_path, config.pad_size)
+    print("[build_dataset] dev len: {}".format(len(train)), flush=True)
     test = load_dataset(config.test_path, config.pad_size)
+    print("[build_dataset] test len: {}".format(len(train)), flush=True)
 
     return 0, train, dev, test
 

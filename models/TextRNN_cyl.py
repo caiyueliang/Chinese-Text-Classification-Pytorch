@@ -43,7 +43,7 @@ class Config(object):
 
         # self.embed = self.embedding_pretrained.size(1)\
         #     if self.embedding_pretrained is not None else 300         # 字向量维度, 若使用了预训练词向量，则维度统一
-        self.embed = 30
+        self.embed = 18
 
         self.hidden_size = 128                                          # lstm隐藏层
         self.num_layers = 2                                             # lstm层数
@@ -66,18 +66,18 @@ class Model(nn.Module):
         self.fc = nn.Linear(config.hidden_size * 2, config.num_classes)
 
     def forward(self, x):
-        print(" =============================== ")
+        # print(" =============================== ")
         # x = x[0]                        # [batch_size, seq_len] = [128, 32]
-        print("[TextRNN] x: {}".format(x.size()))
+        # print("[TextRNN] x: {}".format(x.size()))
 
         out = x
         # out = self.embedding(x)       # [batch_size, seq_len, embedding] = [128, 32, 300]
-        print("[TextRNN] after [embedding]: {}".format(out.size()))
+        # print("[TextRNN] after [embedding]: {}".format(out.size()))
 
         out, _ = self.lstm(out)
-        print("[TextRNN] after [lstm]: {}".format(out.size()))
+        # print("[TextRNN] after [lstm]: {}".format(out.size()))
         out = self.fc(out[:, -1, :])    # 句子最后时刻的 hidden state
-        print("[TextRNN] after [fc]: {}".format(out.size()))
+        # print("[TextRNN] after [fc]: {}".format(out.size()))
 
         return out
 

@@ -67,8 +67,8 @@ class Model(nn.Module):
 
     def forward(self, x):
         print(" =============================== ")
-        x = x[0]                        # [batch_size, seq_len] = [128, 32]
-        print("[TextCNN] x[0]: {}".format(x.size()))
+        # x = x[0]                        # [batch_size, seq_len] = [128, 32]
+        print("[TextCNN] x: {}".format(x.size()))
 
         out = x
         # out = self.embedding(x)       # [batch_size, seq_len, embedding] = [128, 32, 300]

@@ -28,28 +28,31 @@ def init_network(model, method='xavier', exclude='embedding', seed=123):
 
 def train(config, model, train_iter, dev_iter, test_iter):
     start_time = time.time()
-    # model.double()
     model.train()
     optimizer = torch.optim.Adam(model.parameters(), lr=config.learning_rate)
 
     # 学习率指数衰减，每次epoch：学习率 = gamma * 学习率
-    scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.99)
+    scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.97)
     total_batch = 0                     # 记录进行到多少batch
     dev_best_loss = float('inf')
-    last_improve = 0                    # 记录上次验证集loss下降的batch数
-    flag = False                        # 记录是否很久没有效果提升
+    # last_improve = 0                  # 记录上次验证集loss下降的batch数
+    # flag = False                      # 记录是否很久没有效果提升
+
     writer = SummaryWriter(log_dir=config.log_path + '/' + time.strftime('%m-%d_%H.%M', time.localtime()))
+
     for epoch in range(config.num_epochs):
+        model.train()
+
         # print('Epoch [{}/{}]'.format(epoch + 1, config.num_epochs), flush=True)
         scheduler.step()                # 学习率衰减
 
         batch_num = 0
-        loss_total = 0
+        loss_total = 0.0
         for i, (trains, labels) in enumerate(train_iter):
             outputs = model(trains)
             model.zero_grad()
-            # print("[outputs] {} {}".format(outputs.type(), outputs))
-            # print("[labels] {} {}".format(labels.type(), labels))
+            # print("[outputs] {} {}".format(outputs.type(), outputs), flush=True)
+            # print("[labels] {} {}".format(labels.type(), labels), flush=True)
             loss = F.cross_entropy(outputs, labels)
             loss.backward()
             optimizer.step()
@@ -61,31 +64,34 @@ def train(config, model, train_iter, dev_iter, test_iter):
             # predict = torch.max(outputs.data, 1)[1].cpu()
             # train_acc = metrics.accuracy_score(true, predict)
 
+        # =========================================================================
+        # 在 dev 集上评估效果
         dev_acc, dev_loss = evaluate(config, model, dev_iter)
         if dev_loss < dev_best_loss:
             print("model save ...", flush=True)
             dev_best_loss = dev_loss
             torch.save(model.state_dict(), config.save_path)
             improve = '*'
-            last_improve = total_batch
+            # last_improve = total_batch
 
-            # 用 test 集 评估效果
+            # 在 test 集上评估效果
             test(config, model, test_iter)
         else:
             improve = ''
+
         time_dif = get_time_dif(start_time)
 
         loss_avg = loss_total / float(batch_num)
         msg = 'Epoch [{0:>6}/{1:>6}] Train Loss: {2:>5.2}, Val Loss: {3:>5.2}, Val Acc: {4:>6.2%}, Time: {5} {6}'
         print(msg.format(epoch+1, config.num_epochs, loss_avg, dev_loss, dev_acc, time_dif, improve), flush=True)
+
         writer.add_scalar("loss/train", loss_avg, total_batch)
         writer.add_scalar("loss/dev", dev_loss, total_batch)
         # writer.add_scalar("acc/train", train_acc, total_batch)
         writer.add_scalar("acc/dev", dev_acc, total_batch)
 
-        model.train()
-
     writer.close()
+
     test(config, model, test_iter)
 
 

@@ -5,6 +5,7 @@ import numpy as np
 import pickle as pkl
 from tqdm import tqdm
 import time
+import random
 from datetime import timedelta
 
 
@@ -28,6 +29,58 @@ def build_vocab(file_path, tokenizer, max_size, min_freq):
     return vocab_dic
 
 
+# =========================================================================
+def random_mask_rows(tensor_list: list, num_mask=1, max_mask=1):
+    new_tensor_list = []
+
+    for tensor in tensor_list:
+        # print("==========================", flush=True)
+        # print(tensor.size(), flush=True)
+        # print(tensor, flush=True)
+        max_len = tensor.size()[0]
+
+        # time mask
+        for i in range(num_mask):
+            start = random.randint(0, max_len - 1)
+            length = random.randint(1, max_mask)
+            end = min(max_len, start + length)
+
+            # print("max_len:{}, start:{}, end:{}".format(max_len, start, end), flush=True)
+            tensor[start:end, :] = 0
+
+        # print(tensor, flush=True)
+        # print("==========================", flush=True)
+        new_tensor_list.append(tensor)
+
+    return new_tensor_list
+
+
+def random_mask_columns(tensor_list: list, num_mask=1, max_mask=1):
+    new_tensor_list = []
+
+    for tensor in tensor_list:
+        # print("==========================", flush=True)
+        # print(tensor.size(), flush=True)
+        # print(tensor, flush=True)
+        max_len = tensor.size()[1]
+
+        # freq mask
+        for i in range(num_mask):
+            start = random.randint(0, max_len - 1)
+            length = random.randint(1, max_mask)
+            end = min(max_len, start + length)
+
+            # print("max_len:{}, start:{}, end:{}".format(max_len, start, end), flush=True)
+            tensor[:, start:end] = 0
+
+        # print(tensor, flush=True)
+        # print("==========================", flush=True)
+        new_tensor_list.append(tensor)
+
+    return new_tensor_list
+
+
+# =========================================================================
 def build_dataset(config, ues_word):
     """
     返回的数据的格式：[([...], 0), ([...], 1), ...]
@@ -48,48 +101,35 @@ def build_dataset(config, ues_word):
 
 
 class DatasetIterater(object):
-    def __init__(self, batches, batch_size, device):
+    def __init__(self, batches, batch_size, device, train_flag=False):
         self.batch_size = batch_size
         self.batches = batches
         self.n_batches = len(batches) // batch_size
+
         self.residue = False  # 记录batch数量是否为整数 
         if len(batches) % self.n_batches != 0:
             self.residue = True
+
         self.index = 0
         self.device = device
+        self.train_flag = train_flag
 
-    # def _to_tensor(self, datas):
-    #     # xx = [xxx[2] for xxx in datas]
-    #     # indexx = np.argsort(xx)[::-1]
-    #     # datas = np.array(datas)[indexx]
-    #     x = torch.LongTensor([_[0] for _ in datas]).to(self.device)
-    #     y = torch.LongTensor([_[1] for _ in datas]).to(self.device)
-    #     bigram = torch.LongTensor([_[3] for _ in datas]).to(self.device)
-    #     trigram = torch.LongTensor([_[4] for _ in datas]).to(self.device)
-    #
-    #     # pad前的长度(超过pad_size的设为pad_size)
-    #     seq_len = torch.LongTensor([_[2] for _ in datas]).to(self.device)
-    #     return (x, seq_len, bigram, trigram), y
+    def _to_tensor(self, data):
+        if self.train_flag is False:
+            # dev set or test set
+            tensor_list = [_[0] for _ in data]
+            x = torch.stack(tensor_list, dim=0).to(self.device)
+            x = x.to(torch.float32)
+        else:
+            # train set, use Data Augmentation
+            tensor_list = [_[0] for _ in data]
+            tensor_list = random_mask_rows(tensor_list, num_mask=2, max_mask=4)         # 行 mask
+            tensor_list = random_mask_columns(tensor_list, num_mask=2, max_mask=4)      # 列 mask
+            x = torch.stack(tensor_list, dim=0).to(self.device)
+            x = x.to(torch.float32)
 
-    def _to_tensor(self, datas):
-        # xx = [xxx[2] for xxx in datas]
-        # indexx = np.argsort(xx)[::-1]
-        # datas = np.array(datas)[indexx]
+        y = torch.LongTensor([_[1] for _ in data]).to(self.device)
 
-        # print("====================================")
-        # print([_[0] for _ in datas])
-        # x = torch.Tensor([_[0] for _ in datas]).to(self.device)
-        x = torch.stack([_[0] for _ in datas], dim=0).to(self.device)
-        # print("[_to_tensor] {}".format(x))
-        x = x.to(torch.float32)
-        # print("[_to_tensor] size:{} type:{}".format(x.size(), x.type()))
-        # print("[_to_tensor] {}".format(x))
-        y = torch.LongTensor([_[1] for _ in datas]).to(self.device)
-        # bigram = torch.LongTensor([_[3] for _ in datas]).to(self.device)
-        # trigram = torch.LongTensor([_[4] for _ in datas]).to(self.device)
-        #
-        # # pad前的长度(超过pad_size的设为pad_size)
-        # seq_len = torch.LongTensor([_[2] for _ in datas]).to(self.device)
         return x, y
 
     def __next__(self):
@@ -118,8 +158,8 @@ class DatasetIterater(object):
             return self.n_batches
 
 
-def build_iterator(dataset, config):
-    iter = DatasetIterater(dataset, config.batch_size, config.device)
+def build_iterator(dataset, config, train_flag=False):
+    iter = DatasetIterater(dataset, config.batch_size, config.device, train_flag=train_flag)
     return iter
 
 
@@ -138,8 +178,8 @@ if __name__ == "__main__":
     # a = [[1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3]]
     # b = [[2, 3, 4], [2, 3, 4], [2, 3, 4], [2, 3, 4]]
 
-    a = torch.tensor([[0, 1, 3], [0, 1, 3], [0, 1, 3], [3, 4, 5]])
-    b = torch.tensor([[0, 2, 4], [0, 2, 4], [0, 2, 4], [1, 4, 8]])
+    a = torch.tensor([[1, 1, 1, 1, 1], [2, 2, 2, 2, 2], [3, 3, 3, 3, 3], [4, 4, 4, 4, 4]])
+    b = torch.tensor([[5, 5, 5, 5, 5], [6, 6, 6, 6, 6], [7, 7, 7, 7, 7], [8, 8, 8, 8, 8]])
 
     data.append(a)
     data.append(b)
@@ -148,10 +188,9 @@ if __name__ == "__main__":
 
     # x = torch.Tensor(data)
     # x = torch.cat(data, dim=0)
-    x = torch.stack(data, dim=0)
-    print(x)
-    print(x.size())
-
+    # my_x = torch.stack(data, dim=0)
+    # print(my_x)
+    # print(my_x.size())
 
     # '''提取预训练词向量'''
     # vocab_dir = "./THUCNews/data/vocab.pkl"
@@ -171,3 +210,10 @@ if __name__ == "__main__":
     #         embeddings[idx] = np.asarray(emb, dtype='float32')
     # f.close()
     # np.savez_compressed(filename_trimmed_dir, embeddings=embeddings)
+
+    data = random_mask_rows(data, num_mask=1, max_mask=1)
+    data = random_mask_columns(data, num_mask=1, max_mask=1)
+    print(data)
+    data = torch.stack(data, dim=0)
+    print(data)
+    print(data.size())

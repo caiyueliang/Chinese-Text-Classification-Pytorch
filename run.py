@@ -9,7 +9,6 @@ import argparse
 # torch.set_default_tensor_type(torch.DoubleTensor)
 
 parser = argparse.ArgumentParser(description='Chinese Text Classification')
-# parser.add_argument('--model', type=str, default='TextRNN_cyl', help='choose a model: TextCNN, TextRNN, FastText, TextRCNN, TextRNN_Att, DPCNN, Transformer')
 parser.add_argument('--model', type=str, default='TextCNN_cyl', help='choose a model: TextCNN, TextRNN, FastText, TextRCNN, TextRNN_Att, DPCNN, Transformer')
 parser.add_argument('--dataset', default="E:\PythonProject\TestDemo\quant\data_train\\v1.0.0\\")
 # parser.add_argument('--model', type=str, default='TextCNN', help='choose a model: TextCNN, TextRNN, FastText, TextRCNN, TextRNN_Att, DPCNN, Transformer')
@@ -40,28 +39,25 @@ if __name__ == '__main__':
 
     x = import_module('models.' + model_name)
     config = x.Config(dataset, embedding)
-
     np.random.seed(1)
     torch.manual_seed(1)
     torch.cuda.manual_seed_all(1)
     torch.backends.cudnn.deterministic = True  # 保证每次结果一样
 
     start_time = time.time()
-    print("Loading data...")
-
+    print("Loading data...", flush=True)
     vocab, train_data, dev_data, test_data = build_dataset(config, args.word)
-    train_iter = build_iterator(train_data, config, train_flag=True)
-    dev_iter = build_iterator(dev_data, config, train_flag=False)
-    test_iter = build_iterator(test_data, config, train_flag=False)
-
+    train_iter = build_iterator(train_data, config)
+    dev_iter = build_iterator(dev_data, config)
+    test_iter = build_iterator(test_data, config)
     time_dif = get_time_dif(start_time)
-    print("Time usage:", time_dif)
+    print("Time usage: {}".format(time_dif), flush=True)
 
     # config.n_vocab = len(vocab)
     model = x.Model(config).to(config.device)
     if model_name != 'Transformer':
         init_network(model)
-    print(model.parameters)
+    print(model.parameters, flush=True)
 
     # train
     train(config, model, train_iter, dev_iter, test_iter)
